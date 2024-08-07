@@ -4,8 +4,16 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    // キーボードで移動する
+    // Navigate by keyboard  キーボードで移動する
+
+    Animator animator;
     bool isMoving;
+
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
+
     void Update()
     {
         if (isMoving == false)
@@ -18,19 +26,25 @@ public class PlayerController : MonoBehaviour
                 y = 0;
             }
 
-            StartCoroutine(Move(new Vector2(x, y)));
+            if (x != 0 || y != 0)
+            {
+                animator.SetFloat("InputX", x);
+                animator.SetFloat("InputY", y);
+                StartCoroutine(Move(new Vector2(x, y)));
+            }
         }
+        animator.SetBool("IsMoving", isMoving);
     }
 
-    // １マス徐々に近づける
+    // Gradually move one square closer together. １マス徐々に近づける
     IEnumerator Move(Vector3 direction)
     {
         isMoving = true;
         Vector3 targetPos = transform.position + direction;
-        // 現在のターゲットと場所が違うなら、近づけ続ける。
+        // If the current target and location are different, keep moving closer. 現在のターゲットと場所が違うなら、近づけ続ける。
         while ((targetPos - transform.position).sqrMagnitude > Mathf.Epsilon)
         {
-            // 近づける
+            // put close 近づける
             transform.position = Vector3.MoveTowards(transform.position, targetPos, 5f*Time.deltaTime); // (現在地, 目標値, 速度)　目標値に近づける
             yield return null;
         }
